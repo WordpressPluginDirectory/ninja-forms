@@ -4,7 +4,7 @@ Tags: forms, contact form, email form, form builder, custom form, pdf form, regi
 
 Requires at least: 6.1
 Tested up to: 6.4.2
-Stable tag: 3.7.2
+Stable tag: 3.7.3
 
 License: GPLv2 or later
 
@@ -304,12 +304,23 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.7.2 (29 January 2024)
+= 3.7.3 (12 February 2024)
 * Bug Fixes: *
-- Prevent form display on password protected page
-- Patch a medium severity, low-risk second-order SQL Injection vulnerability
+- Update code for PHP 8.3
+
+* Other: *
+- Add in-app documentation text and links
+- Add scroll bar for long vertical content
 
 == Changelog ==
+= 3.7.3 (12 February 2024)
+* Bug Fixes: *
+- Update code for PHP 8.3
+
+* Other: *
+- Add in-app documentation text and links
+- Add scroll bar for long vertical content
+
 = 3.7.2 (29 January 2024)
 * Bug Fixes: *
 - Prevent form display on password protected page
