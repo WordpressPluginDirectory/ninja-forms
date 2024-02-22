@@ -837,6 +837,7 @@ return apply_filters( 'ninja_forms_field_settings', array(
         'width' => 'one-half',
         'group' => 'advanced',
         'value' => 5,
+        'help'  => esc_html__( 'Adjusts the number of list option selections that are viewable by the user at one time without scrolling through the list.', 'ninja-forms' ),
     ),
 
     /*
