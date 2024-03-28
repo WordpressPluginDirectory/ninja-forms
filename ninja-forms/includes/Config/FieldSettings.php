@@ -1061,7 +1061,7 @@ return apply_filters( 'ninja_forms_field_settings', array(
         'label' => esc_html__( 'Processing Label', 'ninja-forms' ),
         'width' => 'full',
         'group' => 'primary',
-        'value' => esc_textarea( __( 'Processing', 'ninja-forms' ) )
+        'value' => esc_html__( 'Processing', 'ninja-forms' )
     ),
 
     /*

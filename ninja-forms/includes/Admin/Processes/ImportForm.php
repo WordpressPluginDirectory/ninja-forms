@@ -799,7 +799,7 @@ class NF_Admin_Processes_ImportForm extends NF_Abstracts_BatchProcess
         }
 
         if( 'submit' == $field[ 'type' ] ){
-            $field[ 'processing_label' ] = 'Processing';
+            $field[ 'processing_label' ] =  esc_html__( 'Processing', 'ninja-forms' );
         }
 
         if( isset( $field[ 'email' ] ) ){
