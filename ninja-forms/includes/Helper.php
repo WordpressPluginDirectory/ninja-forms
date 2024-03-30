@@ -663,7 +663,8 @@ final class WPN_Helper
     */
     public static function maybe_disallow_unfiltered_html_for_escaping():bool {
 
-        $disallow_unfiltered_html = defined( 'DISALLOW_UNFILTERED_HTML' ) ? DISALLOW_UNFILTERED_HTML : true;
+        // Default intentinally left set to false to avoid breaking countless pre-existing forms using this feature.
+        $disallow_unfiltered_html = defined( 'DISALLOW_UNFILTERED_HTML' ) ? DISALLOW_UNFILTERED_HTML : false;
 
         return $disallow_unfiltered_html;
     }

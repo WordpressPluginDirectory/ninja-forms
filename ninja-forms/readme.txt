@@ -4,7 +4,7 @@ Tags: forms, contact form, email form, form builder, custom form, pdf form, regi
 
 Requires at least: 6.1
 Tested up to: 6.4.3
-Stable tag: 3.8.1
+Stable tag: 3.8.2
 
 License: GPLv2 or later
 
@@ -304,16 +304,18 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.1 (27 March 2024)
+= 3.8.2 (29 March 2024)
 * Bug Fixes: *
-- Ensure submission exports can't be called from any unintended pages
-- Prevent injected scripts into submit button and advanced labels
-- Prevent XSS on image lists
+- Allow default span tags in form labels
 
 * Other: *
 - Update add-on images
 
 == Changelog ==
+= 3.8.2 (29 March 2024)
+* Bug Fixes: *
+- Allow default span tags in form labels
+
 = 3.8.1 (27 March 2024)
 * Bug Fixes: *
 - Ensure submission exports can't be called from any unintended pages
