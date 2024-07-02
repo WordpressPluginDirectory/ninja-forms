@@ -3,8 +3,8 @@ Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorho
 Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.3
-Tested up to: 6.5.2
-Stable tag: 3.8.4
+Tested up to: 6.5.4
+Stable tag: 3.8.5
 Requires PHP: 7.4
 
 License: GPLv2 or later
@@ -310,18 +310,15 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.4 (28 May 2024)
-* Bug Fixes: *
-- Ensure first name field populates only first, not full, name 
-- Enable personally identifiable setting outside of dev mode
-- Add merge tags 'other' for random, year, month, day
-
-* Other: *
-- Set version resolutions for certain packages
-- Improve discoverability of available actions
-- Update marketing feed
+= 3.8.5 (13 June 2024)
+* Bug Fix: *
+- Protect preview query parameters
 
 == Changelog ==
+= 3.8.5 (13 June 2024)
+* Bug Fix: *
+- Protect preview query parameters
+
 = 3.8.4 (28 May 2024)
 * Bug Fixes: *
 - Ensure first name field populates only first, not full, name 
