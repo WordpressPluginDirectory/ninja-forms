@@ -2,9 +2,11 @@
 Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorhouse, jmcelhaney, wpnzach, ericwindhamsd
 Tags: forms, form builder, contact form, lead form, registration form
 
-Requires at least: 6.3
-Tested up to: 6.5.4
-Stable tag: 3.8.5
+
+Requires at least: 6.4
+Tested up to: 6.6
+Stable tag: 3.8.8
+
 Requires PHP: 7.4
 
 License: GPLv2 or later
@@ -310,34 +312,59 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.5 (13 June 2024)
-* Bug Fix: *
-- Protect preview query parameters
+= 3.8.8 (22 July 2024) =
+*Bug Fixes:*
+- Ensure submissions page and Append Ninja Form block are visible on WP 6.6
+
+*Other:*
+- Update readme 'tested up to' and 'requires at least'
 
 == Changelog ==
-= 3.8.5 (13 June 2024)
-* Bug Fix: *
+= 3.8.8 (22 July 2024) =
+*Bug Fixes:*
+- Ensure submissions page and Append Ninja Form block are visible on WP 6.6
+
+*Other:*
+- Update readme 'tested up to' and 'requires at least'
+
+= 3.8.7 (15 July 2024) =
+*Bug Fixes:*
+- prevent licensing CSRF
+
+= 3.8.6 (8 July 2024) =
+*Bug Fixes:*
+- prevent deprecated false to array notice in preview
+- prevent undefined array key 'plugin' warning in class extension updater
+- prevent invalid date error when setting default date format to "j F Y" on non-English languages
+
+*Other:*
+- automated test for version number
+- update wordpress library packages
+- add documentation links to settings in the form builder
+
+= 3.8.5 (13 June 2024) =
+*Bug Fixes:*
 - Protect preview query parameters
 
-= 3.8.4 (28 May 2024)
-* Bug Fixes: *
+= 3.8.4 (28 May 2024) =
+*Bug Fixes:*
 - Ensure first name field populates only first, not full, name 
 - Enable personally identifiable setting outside of dev mode
 - Add merge tags 'other' for random, year, month, day
 
-* Other: *
+*Other:*
 - Set version resolutions for certain packages
 - Improve discoverability of available actions
 - Update marketing feed
 
-= 3.8.3 (1 May 2024)
-* Bug Fixes: *
+= 3.8.3 (1 May 2024) =
+*Bug Fixes:*
 - Ensure fieldset repeaters function on index values ending in 0 (10, 20, etc)
 
-* Other: *
+*Other:*
 - Update tests to run on 6.5.2
 
-= 3.8.2 (29 March 2024)
+= 3.8.2 (29 March 2024) =
 *Bug Fixes:*
 - Allow default span tags in form labels
 

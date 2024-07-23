@@ -3,7 +3,7 @@
 Plugin Name: Ninja Forms
 Plugin URI: http://ninjaforms.com/?utm_source=WordPress&utm_medium=readme
 Description: Ninja Forms is a webform builder with unparalleled ease of use and features.
-Version: 3.8.5
+Version: 3.8.8
 Author: Saturday Drive
 Author URI: http://ninjaforms.com/?utm_source=Ninja+Forms+Plugin&utm_medium=Plugins+WP+Dashboard
 Text Domain: ninja-forms
@@ -43,7 +43,7 @@ final class Ninja_Forms
      * @since 3.0
      */
 
-    const VERSION = '3.8.5';
+    const VERSION = '3.8.8';
 
     /**
      * @since 3.4.0
@@ -269,8 +269,8 @@ final class Ninja_Forms
             self::$instance->settings = apply_filters( 'ninja_forms_settings', get_option( 'ninja_forms_settings' ) );
 
             /*
-                * Admin Menus
-                */
+             * Admin Menus
+             */
             self::$instance->menus[ 'forms' ]           = new NF_Admin_Menus_Forms();
             self::$instance->menus[ 'dashboard' ]       = new NF_Admin_Menus_Dashboard();
             self::$instance->menus[ 'add-new' ]         = new NF_Admin_Menus_AddNew();
@@ -1071,6 +1071,9 @@ final class Ninja_Forms
 
         // Setup our add-on feed wp cron so that our add-on list is up to date on a weekly basis.
         nf_marketing_feed_cron_job();
+
+        // Disable the survey promo for 7 days on new installations.
+        set_transient('ninja_forms_disable_survey_promo', 1, DAY_IN_SECONDS * 7);
     }
 
     /**
@@ -1273,3 +1276,12 @@ add_action("upgrader_process_complete", function($upgrader_object, $options){
         nf_update_marketing_feed();
     }
 }, 10, 2);
+
+
+/**
+ * Call our survey promo on relevant pages.
+ */
+add_action( 'in_admin_header', function() {
+    $surveyPromo = new NF_Admin_SurveyPromo();
+    $surveyPromo->show();
+});
