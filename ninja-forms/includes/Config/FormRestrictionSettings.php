@@ -32,7 +32,8 @@ return apply_filters( 'ninja_forms_from_restriction_settings', array(
                     'listselect',
                     'listradio',
                     'listmultiselect',
-                    'date'
+                    'date',
+                    'hidden'
                 ),
             ),
             

@@ -3,7 +3,7 @@
 Plugin Name: Ninja Forms
 Plugin URI: http://ninjaforms.com/?utm_source=WordPress&utm_medium=readme
 Description: Ninja Forms is a webform builder with unparalleled ease of use and features.
-Version: 3.8.8
+Version: 3.8.9
 Author: Saturday Drive
 Author URI: http://ninjaforms.com/?utm_source=Ninja+Forms+Plugin&utm_medium=Plugins+WP+Dashboard
 Text Domain: ninja-forms
@@ -43,7 +43,7 @@ final class Ninja_Forms
      * @since 3.0
      */
 
-    const VERSION = '3.8.8';
+    const VERSION = '3.8.9';
 
     /**
      * @since 3.4.0
@@ -943,10 +943,11 @@ final class Ninja_Forms
         Ninja_Forms()->template( 'display-noscript-message.html.php', array( 'message' => $noscript_message ) );
 
         //Detect Page builder editor
-        $visual_composer_screen = !empty(get_post_meta(get_queried_object_id(), '_vcv-editorStartedAt', true)) && isset( $_GET['vcv-ajax'] );
+        $visual_composer_screen = isset( $_GET['vcv-ajax'] );
+        $elementor_screen = isset($_GET['elementor-preview']) || (isset($_GET['action']) && $_GET['action'] === 'elementor') || (isset($_POST['action']) && $_POST['action'] === 'elementor_ajax');
         //Set a list of conditions that would lead to loading the iFrame
-        $set_load_iframe_condition = $visual_composer_screen;
-        //FIlter the current result of the conditions
+        $set_load_iframe_condition = $visual_composer_screen || $elementor_screen;
+        //Filter the current result of the conditions
         $load_iframe = apply_filters("ninja_forms_display_iframe",  $set_load_iframe_condition, $form_id);
         
         if( $load_iframe  ) {
