@@ -3,6 +3,7 @@
 		type="tel"
 		value="{{{ _.escape( data.value ) }}}"
 		class="{{{ data.renderClasses() }}} nf-element"
+		{{{ data.maybeDisabled() }}}
 		id="nf-field-{{{ data.id }}}"
 		name="{{ data.custom_name_attribute || 'nf-field-' + data.id + '-' + data.type }}"
 		{{{ data.maybeDisableAutocomplete() }}}

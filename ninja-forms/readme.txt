@@ -5,7 +5,7 @@ Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.4
 Tested up to: 6.6
-Stable tag: 3.8.9
+Stable tag: 3.8.10
 
 Requires PHP: 7.4
 
@@ -312,22 +312,28 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.9 (05 August 2024) =
+= 3.8.10 (05 August 2024) =
 *Bug Fixes:*
-- Submissions Block not showing all submissions data.
-- Removing a repeater fieldset with empty required fields will prevent submission and throw a "Required field" alert
-- Add "Administration" section for all fields
-- Add missing check_admin_referrer parameter
-- Sort by Shortcode on Forms page not numerical
-- Accessibility: Issues with field Description and screen readers
-- Enable hidden fields in the unique field
-- Fix display Form iFrame in Elementor editor
+- Submissions Table block not displayed on published page on some themes
+- Phone field not disabled when expected
+- calc value option of list fields not set with help text
+- Submission page tooltip icon not displayed on environment not using conventional plugins folder path
 
 *Other:*
-- Refactor telemetry dispatch to add unit tests
+- @wordpress dependencies updates
 
 == Changelog ==
-= 3.8.9 (05 August 2024) =
+= 3.8.10 (05 August 2024) =
+*Bug Fixes:*
+- Submissions Table block not displayed on published page on some themes
+- Phone field not disabled when expected
+- calc value option of list fields not set with help text
+- Submission page tooltip icon not displayed on environment not using conventional plugins folder path
+
+*Other:*
+- @wordpress dependencies updates
+
+= 3.8.9 (29 July 2024) =
 *Bug Fixes:*
 - Submissions Block not showing all submissions data.
 - Fix deleted repeater field missing required data halting submission
