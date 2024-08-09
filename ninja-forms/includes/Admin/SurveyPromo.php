@@ -115,10 +115,14 @@ class NF_Admin_SurveyPromo
 	 */
 	public function getNoticeHtml()
 	{
+        $dismissSurveyNoticeHtmlNow = esc_url(add_query_arg('nf-dismiss-survey-notice', 'now'));
+
+        $dismissSurveyNoticeHtmlAlways =esc_url(add_query_arg('nf-dismiss-survey-notice', 'always') );
+        
 		$html = '<div id="nf-top-notice">
         <div class="nf-top-inner">
             <div class="nf-survey-actions"><a class="nf-survey-btn" href="https://ninjaforms.com/core-plugin-survey/?utm_source=Ninja+Forms+Plugin&utm_medium=Admin+Banner&utm_campaign=Core+Plugin+Survey" target="_blank">Win a $100 Amazon gift card!</a>
-                <p class="nf-survey-alt-actions"><a class="nf-survey-remind" href="' . add_query_arg('nf-dismiss-survey-notice', 'now') . '">' . esc_html__('Remind me later', 'ninja-forms') . '</a><span><a class="nf-survey-hide" href="' . add_query_arg('nf-dismiss-survey-notice', 'always') . '">' . esc_html__('Dismiss forever', 'ninja-forms') . '</a></span></p>
+                <p class="nf-survey-alt-actions"><a class="nf-survey-remind" href="' . $dismissSurveyNoticeHtmlNow . '">' . esc_html__('Remind me later', 'ninja-forms') . '</a><span><a class="nf-survey-hide" href="' . $dismissSurveyNoticeHtmlAlways . '">' . esc_html__('Dismiss forever', 'ninja-forms') . '</a></span></p>
             </div>
             <div class="nf-survey-content">
                 <p>' . esc_html__("Learning more about why you're using Ninja Forms helps us shape the future of the plugin to best match your needs. That's really important to us, and why we're offering a chance to win prizes like a $100 Amazon gift card for just a few minutes of your time.", 'ninja-forms') . '</p>

@@ -5,7 +5,7 @@ Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.4
 Tested up to: 6.6
-Stable tag: 3.8.10
+Stable tag: 3.8.11
 
 Requires PHP: 7.4
 
@@ -312,15 +312,9 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.10 (05 August 2024) =
+= 3.8.11 (07 August 2024) =
 *Bug Fixes:*
-- Submissions Table block not displayed on published page on some themes
-- Phone field not disabled when expected
-- calc value option of list fields not set with help text
-- Submission page tooltip icon not displayed on environment not using conventional plugins folder path
-
-*Other:*
-- @wordpress dependencies updates
+- Prevent unused key values on Survey Promo link
 
 == Changelog ==
 = 3.8.10 (05 August 2024) =
