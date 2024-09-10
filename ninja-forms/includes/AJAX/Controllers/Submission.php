@@ -561,6 +561,11 @@ class NF_AJAX_Controllers_Submission extends NF_Abstracts_Controller
 
         $field_class = Ninja_Forms()->fields[ $field_settings['type'] ];
 
+        // If $field_class is not object or string, return w/o checking for method_exists
+        if(!is_object($field_class) && !is_string($field_class)){
+            return;
+        }
+
         if( ! method_exists( $field_class, 'process' ) ) return;
 
         if( $data = $field_class->process( $field_settings, $this->_form_data )  ){
