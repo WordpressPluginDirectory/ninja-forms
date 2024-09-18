@@ -5,7 +5,7 @@ Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.4
 Tested up to: 6.6.1
-Stable tag: 3.8.15
+Stable tag: 3.8.16
 
 Requires PHP: 7.4
 
@@ -312,16 +312,17 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.15 (10 September 2024) =
+= 3.8.16 (17 September 2024) =
 *Bug Fixes:*
-- Ensure "From Address" email warning shows
-- Prevent JS error on datepicker inside fieldset repeater
-
-*Other:*
-- Add PHP compatibility tests
-- Add usage telemetry data
+- Ensure sanitation of email address for merge tag
+- Prevent maintenance mode interception
 
 == Changelog ==
+= 3.8.16 (17 September 2024) =
+*Bug Fixes:*
+- Ensure sanitation of email address for merge tag
+- Prevent maintenance mode interception
+
 = 3.8.15 (10 September 2024) =
 *Bug Fixes:*
 - Ensure "From Address" email warning shows
