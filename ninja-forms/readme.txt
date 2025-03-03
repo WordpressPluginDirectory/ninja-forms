@@ -2,10 +2,9 @@
 Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorhouse, jmcelhaney, wpnzach, ericwindhamsd
 Tags: forms, form builder, contact form, lead form, registration form
 
-
 Requires at least: 6.5
 Tested up to: 6.7
-Stable tag: 3.8.24
+Stable tag: 3.9.1
 
 Requires PHP: 7.4
 
@@ -312,18 +311,49 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.8.24 (21 January 2025)
+= 3.9.1 (24 February 2025) =
+*Features:*
+- Allows repeatable fieldsets to be editable in the Submissions page.
+
 *Bug Fixes:*
-- Fixed an accessibility issue related to text contrast when using opinionated styles.
-- Fixed accessibility errors related to missing field descriptions.
+- Numbers over 10 billion no longer cause validation errors.
+
+*Other:*
+- Add add-on communication status logs to the System Status page.
+- Add additional data points for telemetry.
+- Update build files.
 
 == Changelog ==
-= 3.8.24 (21 January 2025)
+= 3.9.1 (24 February 2025) =
+*Features:*
+- Allows repeatable fieldsets to be editable in the Submissions page.
+
+*Bug Fixes:*
+- Numbers over 10 billion no longer cause validation errors.
+
+*Other:*
+- Add add-on communication status logs to the System Status page.
+- Add additional data points for telemetry.
+- Build file updates.
+
+= 3.9.0 (10 February 2025) =
+*Features:*
+- New user onboarding
+- Add delete forms WP-CLI command
+
+*Other:*
+- JS library updates
+
+= 3.8.25 (27 January 2025) =
+*Bug Fixes:*
+- ensure form id value is numeric in shortcodes; responsibly reported by Peter Thaleikis via Wordfence
+
+= 3.8.24 (21 January 2025) =
 *Bug Fixes:*
 - Fixed an accessibility issue related to text contrast when using opinionated styles.
 - Fixed accessibility errors related to missing field descriptions.
 
-= 3.8.23 (16 December 2024)
+= 3.8.23 (16 December 2024) =
 *Bug Fixes:*
 - Ensure only permitted form previews are available to a given user
 
