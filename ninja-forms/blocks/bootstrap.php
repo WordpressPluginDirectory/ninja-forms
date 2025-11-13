@@ -33,9 +33,6 @@ add_action('init', function () {
     /**
      * Views Block
      */
-    $token = NinjaForms\Blocks\Authentication\TokenFactory::make();
-    $publicKey = NinjaForms\Blocks\Authentication\KeyFactory::make();
-
     // automatically load dependencies and version
     $block_asset_file = include dirname(__DIR__) . '/build/sub-table-block.asset.php';
     wp_register_script(
@@ -45,9 +42,7 @@ add_action('init', function () {
         $block_asset_file['version']
     );
 
-    wp_localize_script('ninja-forms/submissions-table/block', 'ninjaFormsViews', [
-        'token' => $token->create($publicKey),
-    ]);
+    // Note: Token will be generated per-page in render_callback with specific form IDs
 
     $render_asset_file = include dirname(__DIR__) . '/build/sub-table-render.asset.php';
     wp_register_script(
@@ -57,15 +52,30 @@ add_action('init', function () {
         $render_asset_file['version']
     );
 
-    wp_localize_script('ninja-forms/submissions-table/render', 'ninjaFormsViews', [
-        'token' => $token->create($publicKey),
-    ]);
-
     register_block_type('ninja-forms/submissions-table', array(
         'editor_script' => 'ninja-forms/submissions-table/block',
         'render_callback' => function ($attributes, $content) {
             if (isset($attributes['formID']) && $attributes['formID']) {
                 wp_enqueue_script('ninja-forms/submissions-table/render');
+
+                // Generate a token bound to THIS specific form ID only
+                $formId = absint($attributes['formID']);
+                $token = NinjaForms\Blocks\Authentication\TokenFactory::make();
+                $publicKey = NinjaForms\Blocks\Authentication\KeyFactory::make();
+
+                // Create token with form ID binding and expiration
+                wp_localize_script('ninja-forms/submissions-table/render', 'ninjaFormsViews', [
+                    'token' => $token->create($publicKey, array($formId)),
+                ]);
+                
+                // Enqueue signature fonts for proper display in Gutenberg block
+                wp_enqueue_style(
+                    'nf-signature-fonts',
+                    Ninja_Forms::$url . 'assets/fonts/signature/google-fonts.css',
+                    [],
+                    Ninja_Forms::VERSION
+                );
+
                 $className = 'ninja-forms-views-submissions-table';
                 if (isset($attributes['alignment'])) {
                     $className .= ' align' . $attributes['alignment'];
@@ -113,6 +123,16 @@ add_action('admin_enqueue_scripts', function () {
         'homeUrl' => esc_url_raw( home_url() ), //URL to serve the iFrame that displays the form in blocks editor
         'previewToken' => wp_create_nonce('nf_iframe' )
     ]);
+
+    // For block editor, provide a token that allows access to all forms
+    // This is safe because it's only loaded in admin context with proper capability checks
+    $token = NinjaForms\Blocks\Authentication\TokenFactory::make();
+    $publicKey = NinjaForms\Blocks\Authentication\KeyFactory::make();
+    $allFormIds = array_map(function($form) { return absint($form['formID']); }, $forms);
+
+    wp_localize_script('ninja-forms/submissions-table/block', 'ninjaFormsViews', [
+        'token' => $token->create($publicKey, $allFormIds),
+    ]);
 });
 
 /**
@@ -120,16 +140,73 @@ add_action('admin_enqueue_scripts', function () {
  */
 add_action('rest_api_init', function () {
 
+    /**
+     * Enhanced permission callback that validates token and checks form-level authorization.
+     *
+     * Security improvements:
+     * - Rate limiting to prevent DoS attacks
+     * - Validates token authenticity (hash, expiration)
+     * - Checks if token is authorized for the requested form ID
+     * - Falls back to WordPress capability check for admin users
+     *
+     * @param WP_REST_Request $request
+     * @return bool|WP_Error
+     */
     $tokenAuthenticationCallback = function (WP_REST_Request $request) {
-        $token = NinjaForms\Blocks\Authentication\TokenFactory::make();
-        return $token->validate($request->get_header('X-NinjaFormsViews-Auth'));
+        // Check rate limit first (lightweight check)
+        $endpoint = $request->get_route();
+        $rateLimitCheck = NinjaForms\Blocks\Authentication\RateLimiter::check($endpoint);
+        if (is_wp_error($rateLimitCheck)) {
+            return $rateLimitCheck;
+        }
+
+        $tokenValidator = NinjaForms\Blocks\Authentication\TokenFactory::make();
+        $tokenHeader = $request->get_header('X-NinjaFormsViews-Auth');
+        $formId = $request->get_param('id');
+
+        // If user is logged in and has manage_options capability, allow access
+        // This provides fallback for admin users
+        if (is_user_logged_in() && current_user_can('manage_options')) {
+            return true;
+        }
+
+        // Validate token with form ID authorization
+        if ($formId) {
+            return $tokenValidator->validate($tokenHeader, intval($formId));
+        }
+
+        // For routes without a specific form ID (like /forms list), only validate token structure
+        // The token must still be valid (not expired, proper signature)
+        return $tokenValidator->validate($tokenHeader);
     };
 
     register_rest_route('ninja-forms-views', 'forms', array(
         'methods' => 'GET',
         'callback' => function (WP_REST_Request $request) {
+            $tokenValidator = NinjaForms\Blocks\Authentication\TokenFactory::make();
+            $tokenHeader = $request->get_header('X-NinjaFormsViews-Auth');
+
+            // Get all forms
             $formsBuilder = (new NinjaForms\Blocks\DataBuilder\FormsBuilderFactory)->make();
-            return $formsBuilder->get();
+            $allForms = $formsBuilder->get();
+
+            // If user has manage_options capability, return all forms
+            if (is_user_logged_in() && current_user_can('manage_options')) {
+                return $allForms;
+            }
+
+            // Otherwise, filter forms based on token authorization
+            $authorizedFormIds = $tokenValidator->getFormIds($tokenHeader);
+            if ($authorizedFormIds === false) {
+                return new WP_Error('invalid_token', 'Invalid token', array('status' => 403));
+            }
+
+            // Filter to only return forms the token has access to
+            $filteredForms = array_filter($allForms, function($form) use ($authorizedFormIds) {
+                return in_array(intval($form['formID']), $authorizedFormIds, true);
+            });
+
+            return array_values($filteredForms);
         },
         'permission_callback' => $tokenAuthenticationCallback,
     ));
@@ -189,6 +266,68 @@ add_action('rest_api_init', function () {
         },
         'permission_callback' => $tokenAuthenticationCallback,
     ]);
+
+    /**
+     * Token Refresh Endpoint
+     *
+     * Generates a new token scoped to requested form IDs.
+     * Used for automatic token refresh when tokens expire or after secret rotation.
+     *
+     * Security: Public endpoint with rate limiting (10 requests per 5 minutes)
+     */
+    register_rest_route('ninja-forms-views', 'token/refresh', array(
+        'methods' => 'POST',
+        'callback' => function (WP_REST_Request $request) {
+            $formIds = $request->get_param('formIds');
+
+            // Validate form IDs
+            if (!is_array($formIds) || empty($formIds)) {
+                return new WP_Error(
+                    'invalid_form_ids',
+                    __('Form IDs must be a non-empty array', 'ninja-forms'),
+                    array('status' => 400)
+                );
+            }
+
+            // Sanitize form IDs
+            $formIds = array_map('absint', $formIds);
+            $formIds = array_filter($formIds); // Remove zeros
+
+            if (empty($formIds)) {
+                return new WP_Error(
+                    'invalid_form_ids',
+                    __('No valid form IDs provided', 'ninja-forms'),
+                    array('status' => 400)
+                );
+            }
+
+            // Generate new token scoped to requested forms
+            $publicKey = NinjaForms\Blocks\Authentication\KeyFactory::make(32);
+            $tokenGenerator = NinjaForms\Blocks\Authentication\TokenFactory::make();
+            $newToken = $tokenGenerator->create($publicKey, $formIds);
+
+            return array(
+                'token' => $newToken,
+                'publicKey' => $publicKey,
+                'expiresIn' => 900, // 15 minutes in seconds
+                'formIds' => $formIds,
+            );
+        },
+        'permission_callback' => function (WP_REST_Request $request) {
+            // Apply stricter rate limiting to refresh endpoint
+            $rateLimitCheck = NinjaForms\Blocks\Authentication\RateLimiter::check(
+                '/ninja-forms-views/token/refresh',
+                10,  // limit: 10 requests
+                300  // window: 5 minutes
+            );
+
+            if (is_wp_error($rateLimitCheck)) {
+                return $rateLimitCheck; // Returns 429 Too Many Requests
+            }
+
+            return true; // Public endpoint (rate-limited)
+        },
+    ));
 
 });
 
@@ -255,4 +394,32 @@ add_action( 'wp_head', function () {
         wp_enqueue_script( 'ninja-forms-block-setup' );
     }
 
+});
+
+/**
+ * Schedule WP-Cron job for automatic secret rotation
+ */
+add_action('init', function() {
+    if (!wp_next_scheduled('ninja_forms_views_check_rotation')) {
+        wp_schedule_event(time(), 'daily', 'ninja_forms_views_check_rotation');
+    }
+});
+
+/**
+ * WP-Cron callback: Check if secret should be rotated and rotate if needed
+ */
+add_action('ninja_forms_views_check_rotation', function() {
+    if (NinjaForms\Blocks\Authentication\SecretStore::shouldRotate()) {
+        NinjaForms\Blocks\Authentication\SecretStore::rotate();
+    }
+});
+
+/**
+ * Clear scheduled events on plugin deactivation
+ */
+register_deactivation_hook(__FILE__, function() {
+    $timestamp = wp_next_scheduled('ninja_forms_views_check_rotation');
+    if ($timestamp) {
+        wp_unschedule_event($timestamp, 'ninja_forms_views_check_rotation');
+    }
 });
