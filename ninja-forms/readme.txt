@@ -4,7 +4,7 @@ Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.6
 Tested up to: 6.8.3
-Stable tag: 3.13.1
+Stable tag: 3.13.2
 Requires PHP: 7.4
 
 License: GPLv2 or later
@@ -310,11 +310,15 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.13.1 (November 17, 2025) =
+= 3.13.2 (November 25, 2025) =
 *Bug Fixes:*
-- Ensure submission block token valid only for given page
+- Prevent unserialization of user submitted values
 
 == Changelog ==
+= 3.13.2 (November 25, 2025) =
+*Bug Fixes:*
+- Prevent unserialization of user submitted values
+
 = 3.13.1 (November 17, 2025) =
 *Bug Fixes:*
 - Ensure submission block token valid only for given page
