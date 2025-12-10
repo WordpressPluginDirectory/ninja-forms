@@ -273,51 +273,132 @@ add_action('rest_api_init', function () {
      * Generates a new token scoped to requested form IDs.
      * Used for automatic token refresh when tokens expire or after secret rotation.
      *
-     * Security: Public endpoint with rate limiting (10 requests per 5 minutes)
+     * FIX: Restricts token generation to single forms and validates form access
      */
     register_rest_route('ninja-forms-views', 'token/refresh', array(
         'methods' => 'POST',
         'callback' => function (WP_REST_Request $request) {
-            $formIds = $request->get_param('formIds');
+            // REFACTOR: Accept single formID instead of formIds array
+            $formId = $request->get_param('formID');
+            
+            // Check for legacy formIds parameter for backward compatibility
+            if (!$formId && $request->get_param('formIds')) {
+                $formIds = $request->get_param('formIds');
+                if (is_array($formIds) && !empty($formIds)) {
+                    // Only accept single form from legacy array
+                    if (count($formIds) > 1) {
+                        return new WP_Error(
+                            'too_many_form_ids',
+                            __('Token generation is limited to one form at a time. Please use formID parameter instead.', 'ninja-forms'),
+                            array('status' => 400)
+                        );
+                    }
+                    $formId = $formIds[0];
+                }
+            }
 
-            // Validate form IDs
-            if (!is_array($formIds) || empty($formIds)) {
+            // Sanitize and validate form ID
+            $formId = absint($formId);
+            
+            if (!$formId) {
                 return new WP_Error(
-                    'invalid_form_ids',
-                    __('Form IDs must be a non-empty array', 'ninja-forms'),
+                    'invalid_form_id',
+                    __('Valid form ID is required', 'ninja-forms'),
                     array('status' => 400)
                 );
             }
 
-            // Sanitize form IDs
-            $formIds = array_map('absint', $formIds);
-            $formIds = array_filter($formIds); // Remove zeros
-
-            if (empty($formIds)) {
+            // FIX: Validate that the form exists and is accessible
+            $form = Ninja_Forms()->form( $formId )->get();
+            if (!$form) {
                 return new WP_Error(
-                    'invalid_form_ids',
-                    __('No valid form IDs provided', 'ninja-forms'),
-                    array('status' => 400)
+                    'form_not_found',
+                    __('The requested form does not exist', 'ninja-forms'),
+                    array('status' => 404)
                 );
             }
 
-            // Generate new token scoped to requested forms
+            // FIX: Validate that user has permission to access this form
+            // This prevents users from generating tokens for arbitrary forms
+            $referer = wp_get_referer();
+            if (!$referer) {
+                return new WP_Error(
+                    'invalid_request',
+                    __('Request must come from a valid page with submissions table block', 'ninja-forms'),
+                    array('status' => 403)
+                );
+            }
+
+            // Parse the referring page to validate block authorization
+            $post_id = url_to_postid($referer);
+            if (!$post_id) {
+                // Handle front page, archives, etc.
+                $parsed_url = parse_url($referer);
+                if ($parsed_url['path'] === '/' || $parsed_url['path'] === home_url('/')) {
+                    $post_id = get_option('page_on_front');
+                }
+            }
+
+            // Check if the form is actually embedded in a submissions table block on this page
+            if ($post_id) {
+                $post = get_post($post_id);
+                if ($post && has_blocks($post->post_content)) {
+                    $blocks = parse_blocks($post->post_content);
+                    $found_authorized_form = false;
+                    
+                    // Recursively search for ninja-forms/submissions-table blocks
+                    $search_blocks = function($blocks) use ($formId, &$found_authorized_form, &$search_blocks) {
+                        foreach ($blocks as $block) {
+                            if ($block['blockName'] === 'ninja-forms/submissions-table') {
+                                if (isset($block['attrs']['formID']) && 
+                                    intval($block['attrs']['formID']) === $formId) {
+                                    $found_authorized_form = true;
+                                    return;
+                                }
+                            }
+                            // Search inner blocks recursively
+                            if (!empty($block['innerBlocks'])) {
+                                $search_blocks($block['innerBlocks']);
+                            }
+                        }
+                    };
+                    
+                    $search_blocks($blocks);
+                    
+                    if (!$found_authorized_form) {
+                        return new WP_Error(
+                            'unauthorized_form_access',
+                            __('You do not have permission to access this form via this page', 'ninja-forms'),
+                            array('status' => 403)
+                        );
+                    }
+                }
+            } else {
+                // If we can't determine the post ID, return an error
+                return new WP_Error(
+                    'post_id_not_found',
+                    __('The requested data could not be related to a valid page', 'ninja-forms'),
+                    array('status' => 403)
+                );
+            }
+
+            // Generate new token scoped to the single requested form
             $publicKey = NinjaForms\Blocks\Authentication\KeyFactory::make(32);
             $tokenGenerator = NinjaForms\Blocks\Authentication\TokenFactory::make();
-            $newToken = $tokenGenerator->create($publicKey, $formIds);
+            $newToken = $tokenGenerator->create($publicKey, array($formId));
 
             return array(
                 'token' => $newToken,
                 'publicKey' => $publicKey,
                 'expiresIn' => 900, // 15 minutes in seconds
-                'formIds' => $formIds,
+                'formID' => $formId, // Changed from formIds to formID
             );
         },
         'permission_callback' => function (WP_REST_Request $request) {
             // Apply stricter rate limiting to refresh endpoint
             $rateLimitCheck = NinjaForms\Blocks\Authentication\RateLimiter::check(
                 '/ninja-forms-views/token/refresh',
-                10,  // limit: 10 requests
+                50,  // limit: 50 requests
                 300  // window: 5 minutes
             );
 
@@ -325,7 +406,7 @@ add_action('rest_api_init', function () {
                 return $rateLimitCheck; // Returns 429 Too Many Requests
             }
 
-            return true; // Public endpoint (rate-limited)
+            return true; // Public endpoint (rate-limited) but with form validation
         },
     ));
 
