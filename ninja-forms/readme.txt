@@ -1,10 +1,10 @@
 === Ninja Forms - The Contact Form Builder That Grows With You ===
-Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorhouse, jmcelhaney, wpnzach, ericwindhamsd, mrpritchett
+Contributors: wpninjasllc, kstover, jameslaws, kbjohnson90, klhall1987, krmoorhouse, jmcelhaney, wpnzach, ericwindhamsd, mrpritchett, stuartsequeira, nahuelmahe
 Tags: forms, form builder, contact form, lead form, registration form
 
 Requires at least: 6.7
 Tested up to: 6.9
-Stable tag: 3.13.4
+Stable tag: 3.14.0
 Requires PHP: 7.4
 
 License: GPLv2 or later
@@ -310,11 +310,21 @@ This section describes how to install the plugin and get it working.
 5. Beautiful Forms Every Time!
 
 == Upgrade Notice ==
-= 3.13.4 (January 14, 2026) =
+= 3.14.0 (January 26, 2026) =
+* Features:*
+- Add support for Abilities API
+
 *Bug Fixes:*
-- Check visibility to prevent post spoofing
+- Prevent loading CDN font per GDPR rules
 
 == Changelog ==
+= 3.14.0 (January 26, 2026) =
+* Features:*
+- Add support for Abilities API
+
+*Bug Fixes:*
+- Prevent loading CDN font per GDPR rules
+
 = 3.13.4 (January 14, 2026) =
 *Bug Fixes:*
 - Check visibility to prevent post spoofing
